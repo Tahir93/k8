@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-ub1
+  labels:
+   deployment: deployment-ub1
+spec:
+  selector:
+    matchLabels:
+      pod: pod-ub1
+  replicas: 1 # tells deployment to run 2 pods matching the template
+  template:
+    metadata:
+      labels:
+        pod: pod-ub1
+    spec:
+     containers:
+     - name: ub-basic
+       image: johntmoy13/ub-basic:with_web_server
+       command: ["/bin/sleep", "3650d"]
+#       command: ["/etc/init.d/ssh start"]
+#       command: ["/bin/service apache2 start"]
+       imagePullPolicy: IfNotPresent
+     restartPolicy: Always
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-ub1
+  labels:
+    service: service-ub1
+spec:
+  type: NodePort
+  ports:
+  - name: port80
+    port: 80
+    nodePort: 30080
+  - name: port22
+    port: 22
+    nodePort: 30022  
+  selector:
+    pod: pod-ub1
