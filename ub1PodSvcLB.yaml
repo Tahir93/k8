@@ -1,0 +1,39 @@
+#ubuntu pod deployment
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-ub1
+  labels:
+    pod: pod-ub1
+spec:
+  containers:
+  - name: ub-basic
+    image: johntmoy13/ub-basic:with_web_server
+    command: ["/bin/sleep", "3650d"]
+    imagePullPolicy: IfNotPresent
+  restartPolicy: Always
+
+---
+#ubuntu LoadBalancer service deployment for port 22
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-ub1
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+    service.beta.kubernetes.io/azure-load-balancer-internal-subnet: "aks-subnet"
+spec:
+  type: LoadBalancer
+  loadBalancerIP: 10.224.0.8
+  ports:
+  - name: tcp22
+    port: 22
+  - name: tcp80
+    port: 80
+  - name: tcp2222
+    port: 2222
+    targetPort: 22
+  selector:
+    pod: pod-ub1
